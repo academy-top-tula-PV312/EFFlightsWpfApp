@@ -1,4 +1,5 @@
 ﻿using EFFlightsWpfApp.Model;
+using EFFlightsWpfApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,20 +22,18 @@ namespace EFFlightsWpfApp
     /// </summary>
     public partial class CitiesView : Window
     {
-        ObservableCollection<City> cities;
         bool edit = false;
         bool add = false;
+
+        
+
         public CitiesView()
         {
             InitializeComponent();
 
 
-            using (AirFlightsDbContext context = new())
-            {
-                cities = new(context.Cities.ToList());
-            }
+            DataContext = new CityViewModel();
 
-            citiesListBox.ItemsSource = cities;
             citiesListBox.DisplayMemberPath = "Title";
 
             stackCityTitle.Visibility = Visibility.Hidden;
@@ -46,12 +45,15 @@ namespace EFFlightsWpfApp
             {
                 add = true;
                 stackCityTitle.Visibility = Visibility.Visible;
+                cityTitleTextBox.Text = "";
             }
         }
 
         private void btnCityEdit_Click(object sender, RoutedEventArgs e)
         {
-            if(!edit && !add)
+            if(citiesListBox.SelectedItem is null) return;
+
+            if(!edit || !add)
             {
                 edit = true;
                 stackCityTitle.Visibility = Visibility.Visible;
@@ -61,7 +63,12 @@ namespace EFFlightsWpfApp
 
         private void btnCityDelete_Click(object sender, RoutedEventArgs e)
         {
-
+            if(citiesListBox.SelectedItem is null) return;
+            if (!edit || !add)
+            {
+                (DataContext as CityViewModel).DeleteCityCommand
+                                              .Execute(citiesListBox.SelectedItem);
+            }
         }
 
         private void btnCityTitleSave_Click(object sender, RoutedEventArgs e)
@@ -70,29 +77,27 @@ namespace EFFlightsWpfApp
             {
                 if (cityTitleTextBox.Text.Trim() != "")
                 {
-                    City city = new() { Title = cityTitleTextBox.Text };
-                    using (AirFlightsDbContext context = new())
-                    {
-                        cities.Add(city);
-                        context.Cities.Add(city);
-                        context.SaveChanges();
-                    }
+                    (DataContext as CityViewModel).AddCityCommand
+                                                  .Execute(new City() { Title = cityTitleTextBox.Text});
+                    
                 }
                 add = false;
             }
 
             if(edit)
             {
-                if(citiesListBox.SelectedItem is not null)
+                if(citiesListBox.SelectedItem is not null && !String.IsNullOrEmpty(cityTitleTextBox.Text.Trim()))
                 {
-                    City cityList = citiesListBox.SelectedItem as City;
-                    using (AirFlightsDbContext context = new())
-                    {
-                        City cityDb = context.Cities.Find(cityList.Id) as City;
-                        cityList.Title = cityDb.Title = cityTitleTextBox.Text;
-                        context.SaveChanges();
-                    }
+                    (DataContext as CityViewModel).EditCityCommand
+                                                  .Execute(
+                                                    new City()
+                                                    {
+                                                        Id = (citiesListBox.SelectedItem as City).Id,
+                                                        Title = cityTitleTextBox.Text
+                                                    });
+                    citiesListBox.Items.Refresh();
                 }
+                
                 edit = false;
             }
 

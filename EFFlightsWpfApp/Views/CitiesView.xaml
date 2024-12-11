@@ -12,7 +12,9 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ListBox Grid.Column="0"
-                 x:Name="citiesListBox" />
+                 x:Name="citiesListBox"
+                 ItemsSource="{Binding Cities}"
+                 SelectedItem="{Binding CitySelect}"/>
         <StackPanel Grid.Column="1">
             <Button x:Name="btnCityAdd" Content="Add City" Click="btnCityAdd_Click"/>
             <Button x:Name="btnCityEdit" Content="Edit City" Click="btnCityEdit_Click"/>
