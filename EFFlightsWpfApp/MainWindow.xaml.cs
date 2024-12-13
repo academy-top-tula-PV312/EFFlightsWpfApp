@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using EFFlightsWpfApp.Views;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,6 +26,12 @@ namespace EFFlightsWpfApp
         {
             CitiesView citiesView = new CitiesView();
             citiesView.Show();
+        }
+
+        private void btnAirlinesView_Click(object sender, RoutedEventArgs e)
+        {
+            AirlinesView airlinesView = new AirlinesView();
+            airlinesView.Show();
         }
     }
 }

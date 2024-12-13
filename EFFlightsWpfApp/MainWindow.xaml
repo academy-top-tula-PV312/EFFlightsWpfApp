@@ -16,6 +16,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel>
             <Button x:Name="btnCitiesView" Content="Cities" Click="btnCitiesView_Click" />
+            <Button x:Name="btnAirlinesView" Content="Airlines" Click="btnAirlinesView_Click" />
         </StackPanel>
     </Grid>
 </Window>

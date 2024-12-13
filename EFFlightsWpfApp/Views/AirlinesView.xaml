@@ -1,0 +1,92 @@
+﻿<Window x:Class="EFFlightsWpfApp.Views.AirlinesView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EFFlightsWpfApp.Views"
+        mc:Ignorable="d"
+        Title="AirlinesView" Height="450" Width="800" Closed="Window_Closed">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0"
+              x:Name="gridAirlinesList">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DataGrid x:Name="airlinesDataGrid"
+                      Grid.Row="0"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding Airlines}"
+                      SelectedItem="{Binding AirlineSelect}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" Width="2*"/>
+                    <DataGridCheckBoxColumn Header="Activity" Binding="{Binding Path=Activity}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="2"
+                        HorizontalAlignment="Center">
+                <Button x:Name="btnAirlineAdd" Content="Add" Click="btnAirlineAdd_Click"/>
+                <Button x:Name="btnAirlineEdit" Content="Edit"/>
+                <Button x:Name="btnAirlineDelete" Content="Delete"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="2"
+              x:Name="gridAirlinesForm">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="5"
+                            Grid.Column="0">
+                    <TextBlock Text="Title"/>
+                    <TextBox x:Name="airlineTitleTextBox"/>
+                    
+                    <TextBlock Text="City"/>
+                    <ComboBox x:Name="citiesComboBox" 
+                              ItemsSource="{Binding Cities}"
+                              SelectedItem="{Binding CitySelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DisplayMemberPath="Title"/>
+
+                    <TextBlock Text="Description"/>
+                    <TextBox x:Name="airlineDescriptionTextBox"
+                               Height="80"/>
+                    
+                    <StackPanel Orientation="Horizontal"
+                                Margin="10">
+                        <CheckBox x:Name="airlineActivityCheckBox"/>
+                        <TextBlock Text="Activity"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="5">
+                    <TextBlock Text="Logotype"/>
+                    <Image x:Name="airlineLogotypeImage"
+                           Height="200"/>
+                    <Button x:Name="btnAirlineLogotypeLoad" Content="Load Logo"/>
+                </StackPanel>
+                
+                
+            </Grid>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="2"
+                        HorizontalAlignment="Center">
+                <Button x:Name="btnAirlineSave" Content="Save" Click="btnAirlineSave_Click"/>
+                <Button x:Name="btnAirlineCancel" Content="Cancel"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
