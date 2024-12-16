@@ -33,8 +33,8 @@
                         Grid.Row="2"
                         HorizontalAlignment="Center">
                 <Button x:Name="btnAirlineAdd" Content="Add" Click="btnAirlineAdd_Click"/>
-                <Button x:Name="btnAirlineEdit" Content="Edit"/>
-                <Button x:Name="btnAirlineDelete" Content="Delete"/>
+                <Button x:Name="btnAirlineEdit" Content="Edit" Click="btnAirlineEdit_Click"/>
+                <Button x:Name="btnAirlineDelete" Content="Delete" Click="btnAirlineDelete_Click"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Column="2"
@@ -54,7 +54,7 @@
                             Grid.Column="0">
                     <TextBlock Text="Title"/>
                     <TextBox x:Name="airlineTitleTextBox"/>
-                    
+
                     <TextBlock Text="City"/>
                     <ComboBox x:Name="citiesComboBox" 
                               ItemsSource="{Binding Cities}"
@@ -67,7 +67,7 @@
                     
                     <StackPanel Orientation="Horizontal"
                                 Margin="10">
-                        <CheckBox x:Name="airlineActivityCheckBox"/>
+                        <CheckBox x:Name="airlineActivityCheckBox" IsThreeState="False" IsChecked="False"/>
                         <TextBlock Text="Activity"/>
                     </StackPanel>
                 </StackPanel>
@@ -85,7 +85,7 @@
                         Grid.Row="2"
                         HorizontalAlignment="Center">
                 <Button x:Name="btnAirlineSave" Content="Save" Click="btnAirlineSave_Click"/>
-                <Button x:Name="btnAirlineCancel" Content="Cancel"/>
+                <Button x:Name="btnAirlineCancel" Content="Cancel" Click="btnAirlineCancel_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

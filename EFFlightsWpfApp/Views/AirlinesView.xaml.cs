@@ -34,7 +34,7 @@ namespace EFFlightsWpfApp.Views
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            airlineViewModel.Dispose();
+            //airlineViewModel.Dispose();
         }
 
         private void btnAirlineAdd_Click(object sender, RoutedEventArgs e)
@@ -43,33 +43,40 @@ namespace EFFlightsWpfApp.Views
             
             add = true;
             gridAirlinesForm.IsEnabled = true;
+            gridAirlinesList.IsEnabled = false;
+            airlineViewModel.AirlineNew = new();
 
-            Binding bindingTitle = new();
-            bindingTitle.Mode = BindingMode.TwoWay;
-            bindingTitle.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            AirlineFormBinding(airlineViewModel.AirlineNew);
+        }
 
-            bindingTitle.Source = airlineViewModel.AirlineNew;
-            bindingTitle.Path = new PropertyPath("Title");
-            airlineTitleTextBox.SetBinding(TextBox.TextProperty, bindingTitle);
+        private void btnAirlineEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if(add || edit) return;
 
+            edit = true;
+            gridAirlinesForm.IsEnabled = true;
+            gridAirlinesList.IsEnabled = false;
 
-            Binding bindingDescript = new();
-            bindingDescript.Mode = BindingMode.TwoWay;
-            bindingDescript.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            airlineViewModel.CitySelect = airlineViewModel.Cities
+                                                          .FirstOrDefault(c => c.Id == airlineViewModel.AirlineSelect.CityId)!;
 
-            bindingDescript.Source = airlineViewModel.AirlineNew;
-            bindingDescript.Path = new PropertyPath("Description");
-            airlineDescriptionTextBox.SetBinding(TextBox.TextProperty, bindingDescript);
+            airlineViewModel.AirlineNew = new()
+            {
+                Id = airlineViewModel.AirlineSelect.Id,
+                Title = airlineViewModel.AirlineSelect.Title,
+                City = airlineViewModel.AirlineSelect.City,
+                CityId = airlineViewModel.AirlineSelect.CityId,
+                Activity = airlineViewModel.AirlineSelect.Activity,
+            };
 
-            Binding bindingActivity = new();
-            bindingActivity.Mode = BindingMode.TwoWay;
-            bindingActivity.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            AirlineFormBinding(airlineViewModel.AirlineNew);
+        }
 
-            bindingActivity.Source = airlineViewModel.AirlineNew;
-            bindingActivity.Path = new PropertyPath("Activity");
-            airlineActivityCheckBox.SetBinding(CheckBox.IsCheckedProperty, bindingActivity);
-
-
+        private void btnAirlineDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (airlineViewModel.AirlineSelect is not null)
+                (DataContext as AirlineViewModel).DeleteAirlineCommand
+                                                 .Execute(null);
         }
 
         private void btnAirlineSave_Click(object sender, RoutedEventArgs e)
@@ -87,8 +94,83 @@ namespace EFFlightsWpfApp.Views
                     };
                     (DataContext as AirlineViewModel).AddAirlineCommand
                                                      .Execute(airline);
+                    AirlineFormClear();
+                    gridAirlinesForm.IsEnabled = false;
+                    gridAirlinesList.IsEnabled = true;
+                    add = false;
+                }
+            }
+
+            if(edit)
+            {
+                if(!String.IsNullOrEmpty(airlineTitleTextBox.Text))
+                {
+                    airlineViewModel.AirlineNew.CityId = (citiesComboBox.SelectedItem as City)!.Id;
+                    //airlineViewModel.AirlineNew.City = (citiesComboBox.SelectedItem as City);
+
+                    (DataContext as AirlineViewModel).EditAirlineCommand
+                                                     .Execute(null);
+
+                    AirlineFormClear();
+                    gridAirlinesForm.IsEnabled = false;
+                    gridAirlinesList.IsEnabled = true;
+                    edit = false;
+
+                    airlinesDataGrid.Items.Refresh();
                 }
             }
         }
+        private void btnAirlineCancel_Click(object sender, RoutedEventArgs e)
+        {
+            if(edit)
+            {
+                BindingOperations.ClearBinding(airlineTitleTextBox, TextBox.TextProperty);
+                BindingOperations.ClearBinding(airlineDescriptionTextBox, TextBox.TextProperty);
+                BindingOperations.ClearBinding(airlineActivityCheckBox, CheckBox.IsCheckedProperty);
+            }
+            AirlineFormClear();
+            gridAirlinesForm.IsEnabled = false;
+            gridAirlinesList.IsEnabled = true;
+            add = false;
+            edit = false;
+        }
+
+
+        private void AirlineFormClear()
+        {
+            airlineTitleTextBox.Text = String.Empty;
+            citiesComboBox.SelectedItem = null;
+            airlineDescriptionTextBox.Text = String.Empty;
+            airlineActivityCheckBox.IsChecked = false;
+        }
+
+        private void AirlineFormBinding(Airline airline)
+        {
+            Binding bindingTitle = new();
+            bindingTitle.Mode = BindingMode.TwoWay;
+            bindingTitle.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+            bindingTitle.Source = airline;
+            bindingTitle.Path = new PropertyPath("Title");
+            airlineTitleTextBox.SetBinding(TextBox.TextProperty, bindingTitle);
+
+            Binding bindingDescript = new();
+            bindingDescript.Mode = BindingMode.TwoWay;
+            bindingDescript.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+            bindingDescript.Source = airline;
+            bindingDescript.Path = new PropertyPath("Description");
+            airlineDescriptionTextBox.SetBinding(TextBox.TextProperty, bindingDescript);
+
+            Binding bindingActivity = new();
+            bindingActivity.Mode = BindingMode.TwoWay;
+            bindingActivity.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+            bindingActivity.Source = airline;
+            bindingActivity.Path = new PropertyPath("Activity");
+            airlineActivityCheckBox.SetBinding(CheckBox.IsCheckedProperty, bindingActivity);
+        }
+
+        
     }
 }

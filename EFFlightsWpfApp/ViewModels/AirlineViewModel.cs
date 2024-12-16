@@ -70,12 +70,71 @@ namespace EFFlightsWpfApp.ViewModels
                     {
                         Airline airline = obj as Airline;
                         Airlines.Add(airline);
+
+                        using (AirFlightsDbContext context = new())
+                        {
+                            context.Airlines.UpdateRange(Airlines.ToArray());
+                            context.SaveChanges();
+                        }
                     }
                 ));
             }
         }
 
+        public FlightsCommand EditAirlineCommand
+        {
+            get
+            {
+                return editAirlineCommand ??
+                    (editAirlineCommand = new FlightsCommand(
+                        obj =>
+                        {
+                            Airline airline = Airlines.FirstOrDefault(a => a.Id == AirlineSelect.Id);
 
+                            airline.Title = AirlineNew.Title;
+                            airline.CityId = CitySelect.Id;
+                            airline.City = CitySelect;
+                            airline.Activity = AirlineNew.Activity;
+
+                            using (AirFlightsDbContext context = new())
+                            {
+                                var airlineContext = context.Airlines.FirstOrDefault(a => a.Id == AirlineSelect.Id);
+                                airlineContext.Title = AirlineNew.Title;
+                                airlineContext.CityId = CitySelect.Id;
+                                airlineContext.City = CitySelect;
+                                airlineContext.Activity = AirlineNew.Activity;
+                                context.SaveChanges();
+                            }
+                        },
+                        _ =>
+                        {
+                            return AirlineSelect is not null;
+                        }
+                        ));
+            }
+        }
+
+        public FlightsCommand DeleteAirlineCommand
+        {
+            get
+            {
+                return deleteAirlineCommand ??
+                    (deleteAirlineCommand = new FlightsCommand(
+                        _ =>
+                        {
+                            int idDelete = AirlineSelect.Id;
+                            var airlineDelete = Airlines.FirstOrDefault(a => a.Id == idDelete);
+                            Airlines.Remove(airlineDelete);
+
+                            using (AirFlightsDbContext context = new())
+                            {
+                                airlineDelete = context.Airlines.FirstOrDefault(a => a.Id == idDelete);
+                                context.Airlines.Remove(airlineDelete);
+                                context.SaveChanges();
+                            }
+                        }));
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
