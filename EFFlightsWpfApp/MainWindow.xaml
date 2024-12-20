@@ -17,6 +17,7 @@
         <StackPanel>
             <Button x:Name="btnCitiesView" Content="Cities" Click="btnCitiesView_Click" />
             <Button x:Name="btnAirlinesView" Content="Airlines" Click="btnAirlinesView_Click" />
+            <Button x:Name="btnAirportsView" Content="Airports" Click="btnAirportsView_Click" />
         </StackPanel>
     </Grid>
 </Window>

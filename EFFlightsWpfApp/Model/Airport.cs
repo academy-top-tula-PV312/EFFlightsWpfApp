@@ -15,7 +15,7 @@ public partial class Airport
 
     public string? ImageUrl { get; set; }
 
-    public bool? Activity { get; set; }
+    public bool Activity { get; set; } = true;
 
     public virtual City? City { get; set; }
 

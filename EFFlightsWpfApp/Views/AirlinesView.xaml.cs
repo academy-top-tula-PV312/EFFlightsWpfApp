@@ -1,7 +1,9 @@
 ﻿using EFFlightsWpfApp.Model;
 using EFFlightsWpfApp.ViewModels;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +26,7 @@ namespace EFFlightsWpfApp.Views
         AirlineViewModel airlineViewModel = new();
         bool add;
         bool edit;
+        //byte[]? imageBuffer = null;
         public AirlinesView()
         {
             InitializeComponent();
@@ -37,6 +40,7 @@ namespace EFFlightsWpfApp.Views
             //airlineViewModel.Dispose();
         }
 
+
         private void btnAirlineAdd_Click(object sender, RoutedEventArgs e)
         {
             if (add || edit) return;
@@ -48,7 +52,6 @@ namespace EFFlightsWpfApp.Views
 
             AirlineFormBinding(airlineViewModel.AirlineNew);
         }
-
         private void btnAirlineEdit_Click(object sender, RoutedEventArgs e)
         {
             if(add || edit) return;
@@ -70,8 +73,12 @@ namespace EFFlightsWpfApp.Views
             };
 
             AirlineFormBinding(airlineViewModel.AirlineNew);
-        }
 
+            byte[]? imageBuffer = airlineViewModel.AirlineSelect.Logotype;
+            
+            if (imageBuffer != null && imageBuffer.Length > 0)
+                airlineLogotypeImage.Source = GetImageFromBytes(imageBuffer);
+        }
         private void btnAirlineDelete_Click(object sender, RoutedEventArgs e)
         {
             if (airlineViewModel.AirlineSelect is not null)
@@ -90,7 +97,8 @@ namespace EFFlightsWpfApp.Views
                         Title = airlineTitleTextBox.Text,
                         City = citiesComboBox.SelectedItem as City,
                         Description = airlineDescriptionTextBox.Text,
-                        Activity = airlineActivityCheckBox.IsChecked
+                        Activity = airlineActivityCheckBox.IsChecked,
+                        Logotype = airlineViewModel.AirlineNew.Logotype,
                     };
                     (DataContext as AirlineViewModel).AddAirlineCommand
                                                      .Execute(airline);
@@ -134,6 +142,34 @@ namespace EFFlightsWpfApp.Views
             add = false;
             edit = false;
         }
+        private void btnAirlineLogotypeLoad_Click(object sender, RoutedEventArgs e)
+        {
+            string? fileName = null;
+            long fileLength = 0;
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if(openFileDialog.ShowDialog() == true)
+            {
+                fileName = openFileDialog.FileName;
+                fileLength = (new FileInfo(fileName)).Length;
+            }
+
+            if (string.IsNullOrEmpty(fileName)) return;
+
+            //airlineViewModel.LogoSource = "";
+            airlineLogotypeImage.Source = null;
+
+            byte[] imageBuffer;
+            using (BinaryReader reader = new(File.Open(fileName, FileMode.Open)))
+            {
+                imageBuffer = reader.ReadBytes(((int)fileLength));
+            }
+
+            airlineViewModel.AirlineNew.Logotype = imageBuffer;
+
+            airlineLogotypeImage.Source = GetImageFromBytes(imageBuffer);
+            
+        }
 
 
         private void AirlineFormClear()
@@ -142,6 +178,7 @@ namespace EFFlightsWpfApp.Views
             citiesComboBox.SelectedItem = null;
             airlineDescriptionTextBox.Text = String.Empty;
             airlineActivityCheckBox.IsChecked = false;
+            airlineLogotypeImage.Source = null;
         }
 
         private void AirlineFormBinding(Airline airline)
@@ -171,6 +208,26 @@ namespace EFFlightsWpfApp.Views
             airlineActivityCheckBox.SetBinding(CheckBox.IsCheckedProperty, bindingActivity);
         }
 
-        
+        private BitmapImage? GetImageFromBytes(byte[] imageBuffer)
+        {
+            if (imageBuffer is null || imageBuffer.Length == 0) return null;
+
+            BitmapImage bitmapImage = new BitmapImage();
+
+            using (MemoryStream imageStream = new(imageBuffer))
+            {
+                imageStream.Position = 0;
+
+                bitmapImage.BeginInit();
+                bitmapImage.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.UriSource = null;
+                bitmapImage.StreamSource = imageStream;
+                bitmapImage.EndInit();
+            }
+            bitmapImage.Freeze();
+
+            return bitmapImage;
+        }
     }
 }

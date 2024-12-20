@@ -17,6 +17,7 @@ namespace EFFlightsWpfApp.ViewModels
         private Airline airlineSelect;
         private Airline airlineNew = new();
         private City citySelect;
+        private string logoSource;
 
         private FlightsCommand addAirlineCommand;
         private FlightsCommand editAirlineCommand;
@@ -48,6 +49,16 @@ namespace EFFlightsWpfApp.ViewModels
             set
             {
                 citySelect = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string LogoSource
+        {
+            get => logoSource;
+            set
+            {
+                logoSource = value;
                 OnPropertyChanged();
             }
         }
@@ -93,22 +104,31 @@ namespace EFFlightsWpfApp.ViewModels
 
                             airline.Title = AirlineNew.Title;
                             airline.CityId = CitySelect.Id;
-                            airline.City = CitySelect;
+                            //airline.City = CitySelect;
                             airline.Activity = AirlineNew.Activity;
+                            airline.Logotype = AirlineNew.Logotype;
 
                             using (AirFlightsDbContext context = new())
                             {
                                 var airlineContext = context.Airlines.FirstOrDefault(a => a.Id == AirlineSelect.Id);
-                                airlineContext.Title = AirlineNew.Title;
-                                airlineContext.CityId = CitySelect.Id;
-                                airlineContext.City = CitySelect;
-                                airlineContext.Activity = AirlineNew.Activity;
-                                context.SaveChanges();
+                                if(airlineContext != null)
+                                {
+                                    airlineContext.Title = AirlineNew.Title;
+                                    airlineContext.CityId = CitySelect.Id;
+                                    airlineContext.City = CitySelect;
+                                    airlineContext.Activity = AirlineNew.Activity;
+                                    airlineContext.Logotype = AirlineNew.Logotype;
+                                    //context.Update(airlineContext);
+                                    context.SaveChanges(true);
+                                }
+
+                                //context.Airlines.UpdateRange(Airlines);
+                                //context.SaveChanges();
                             }
                         },
                         _ =>
                         {
-                            return AirlineSelect is not null;
+                            return (AirlineSelect is not null);
                         }
                         ));
             }

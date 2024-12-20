@@ -33,5 +33,11 @@ namespace EFFlightsWpfApp
             AirlinesView airlinesView = new AirlinesView();
             airlinesView.Show();
         }
+
+        private void btnAirportsView_Click(object sender, RoutedEventArgs e)
+        {
+            AirportsView airportsView = new AirportsView();
+            airportsView.Show();
+        }
     }
 }

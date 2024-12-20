@@ -8,13 +8,13 @@ public partial class AirFlightsDbContext : DbContext
 {
     public AirFlightsDbContext()
     {
-        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     public AirFlightsDbContext(DbContextOptions<AirFlightsDbContext> options)
         : base(options)
     {
-        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     public virtual DbSet<Airline> Airlines { get; set; }
